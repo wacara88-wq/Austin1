@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f7fbff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="My Savings">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon-512.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <title>My Savings — Money Journal</title>
+  <style>
+    :root{
+      --bg:#f6fbff; --card:rgba(255,255,255,.86); --ink:#263746; --muted:#738493;
+      --line:rgba(90,120,140,.15); --blue:#76bde8; --blue2:#dff2ff; --green:#6fbd9a;
+      --gold:#e6bf73; --pink:#e9a6ba; --shadow:0 18px 50px rgba(61,103,133,.13);
+      --radius:24px;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);
+      background:linear-gradient(180deg,#eef9ff 0%,#fbfdff 38%,#f7fbfd 100%);min-height:100vh}
+    button,input,select{font:inherit} button{cursor:pointer}
+    .hero{min-height:440px;background-image:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.82) 84%,#f6fbff 100%),url("home.png");
+      background-size:cover;background-position:center top;position:relative}
+    .hero:after{content:"";position:absolute;inset:auto 0 0;height:150px;background:linear-gradient(transparent,#f6fbff)}
+    .nav{position:relative;z-index:2;max-width:1180px;margin:auto;padding:22px 24px;display:flex;justify-content:space-between;align-items:center}
+    .brand{font-weight:800;letter-spacing:.08em;color:#56758a}.brand small{display:block;font-weight:500;letter-spacing:.02em;color:#8497a5;margin-top:2px}
+    .nav-actions{display:flex;gap:10px}.pill{border:1px solid rgba(255,255,255,.7);background:rgba(255,255,255,.62);backdrop-filter:blur(12px);padding:10px 15px;border-radius:999px;color:#496578}
+    .hero-copy{position:relative;z-index:2;max-width:1180px;margin:100px auto 0;padding:0 24px}.eyebrow{text-transform:uppercase;letter-spacing:.18em;font-size:12px;color:#6c9db8;font-weight:700}
+    h1{font-size:clamp(38px,6vw,72px);line-height:.98;margin:12px 0;color:#30485a;max-width:680px}.hero-copy p{max-width:560px;color:#657c8c;font-size:17px;line-height:1.7}
+    .container{max-width:1180px;margin:-15px auto 80px;padding:0 20px;position:relative;z-index:3}
+    .tabs{display:flex;gap:8px;overflow:auto;padding:8px;background:rgba(255,255,255,.72);border:1px solid var(--line);backdrop-filter:blur(14px);border-radius:18px;box-shadow:var(--shadow)}
+    .tab{border:0;background:transparent;padding:11px 18px;border-radius:12px;color:#718593;white-space:nowrap}.tab.active{background:#eaf6ff;color:#3e7697;font-weight:700}
+    .section{display:none;margin-top:22px}.section.active{display:block}
+    .grid{display:grid;gap:16px}.cards{grid-template-columns:repeat(3,minmax(0,1fr));margin-top:18px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px}
+    .money-card{position:relative;overflow:hidden}.money-card:before{content:"";position:absolute;width:130px;height:130px;border-radius:50%;right:-55px;top:-55px;background:var(--accent,#dff2ff);opacity:.65}
+    .label{color:var(--muted);font-size:13px}.amount{font-size:34px;font-weight:800;margin:8px 0 4px;letter-spacing:-.03em}.currency{font-size:15px;color:#7e919d}.change{font-size:13px;margin-top:10px}.up{color:#4d9b7b}.down{color:#bf7487}
+    .icon{font-size:24px}.two{grid-template-columns:1.35fr .65fr}.three{grid-template-columns:repeat(3,1fr)}
+    .section-title{display:flex;align-items:end;justify-content:space-between;margin:28px 0 12px}.section-title h2{margin:0;font-size:22px}.muted{color:var(--muted)}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field label{display:block;font-size:12px;color:#728694;margin-bottom:7px}.field input,.field select{width:100%;padding:13px 14px;border:1px solid var(--line);background:#fff;border-radius:13px;outline:none;color:var(--ink)}.field input:focus,.field select:focus{border-color:#9ccde9;box-shadow:0 0 0 3px #eaf6ff}
+    .primary{border:0;background:linear-gradient(135deg,#78bfe9,#8ccfb3);color:#fff;padding:13px 18px;border-radius:13px;font-weight:800;box-shadow:0 10px 24px rgba(96,175,194,.2)}.secondary{border:1px solid var(--line);background:#fff;color:#587082;padding:11px 15px;border-radius:12px}
+    .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}.full{grid-column:1/-1}
+    .chart-wrap{height:300px}.chart{width:100%;height:100%}
+    .history{display:flex;flex-direction:column;gap:10px}.row{display:grid;grid-template-columns:110px 1fr auto;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}.row:last-child{border-bottom:0}
+    .dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px}.entry-value{font-weight:750}.small{font-size:12px;color:var(--muted)}
+    .empty{padding:30px;text-align:center;color:var(--muted)}
+    .notice{background:#f8fbff;border:1px dashed #bfdceb;border-radius:16px;padding:14px 16px;color:#647e8f;font-size:13px;line-height:1.6}
+    .footer{text-align:center;color:#8a9aa5;font-size:12px;padding:30px}
+    @media(max-width:800px){.hero{min-height:390px}.hero-copy{margin-top:65px}.cards,.three,.two{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.container{padding:0 14px}.amount{font-size:29px}.nav{padding:15px}.row{grid-template-columns:78px 1fr auto}.hero-copy p{font-size:15px}}
+  </style>
+</head>
+<body>
+<header class="hero">
+  <nav class="nav">
+    <div class="brand">MY SAVINGS<small>money journal</small></div>
+    <div class="nav-actions"><button class="pill" id="installBtn" hidden>Install App</button><button class="pill" id="exportTop">Export</button></div>
+  </nav>
+  <div class="hero-copy">
+    <div class="eyebrow">A gentle place for your future</div>
+    <h1>Save quietly.<br>Grow beautifully.</h1>
+    <p>บันทึกเงินสำรองฉุกเฉิน เงินลงทุน ETF และเงินความสุข พร้อมดูการเปลี่ยนแปลงของเงินแต่ละก้อนแบบเข้าใจง่าย</p>
+  </div>
+</header>
+
+<main class="container">
+  <div class="tabs">
+    <button class="tab active" data-tab="dashboard">Overview</button>
+    <button class="tab" data-tab="record">บันทึกเงิน</button>
+    <button class="tab" data-tab="history">ประวัติ</button>
+    <button class="tab" data-tab="settings">ตั้งค่า</button>
+  </div>
+
+  <section class="section active" id="dashboard">
+    <div class="grid cards">
+      <article class="card money-card" style="--accent:#e8f5ff">
+        <div class="icon">🛟</div><div class="label">เงินสำรองฉุกเฉิน</div>
+        <div class="amount" id="eurTotal">0.00 <span class="currency">EUR</span></div>
+        <div class="change" id="eurChange">ยังไม่มีข้อมูล</div>
+      </article>
+      <article class="card money-card" style="--accent:#e7f7f0">
+        <div class="icon">📈</div><div class="label">เงินลงทุน ETF</div>
+        <div class="amount" id="usdTotal">0.00 <span class="currency">USD</span></div>
+        <div class="change" id="usdChange">ยังไม่มีข้อมูล</div>
+      </article>
+      <article class="card money-card" style="--accent:#fff1df">
+        <div class="icon">☀️</div><div class="label">เงินความสุข</div>
+        <div class="amount" id="thbTotal">0.00 <span class="currency">THB</span></div>
+        <div class="change" id="thbChange">ยังไม่มีข้อมูล</div>
+      </article>
+    </div>
+
+    <div class="grid two">
+      <article class="card">
+        <div class="section-title"><h2>การเปลี่ยนแปลง</h2><span class="small">ยอดสะสมจากรายการที่บันทึก</span></div>
+        <div class="chart-wrap"><canvas id="chart" class="chart"></canvas></div>
+      </article>
+      <article class="card">
+        <div class="section-title"><h2>สรุปเดือนนี้</h2></div>
+        <div class="notice">ระบบจะคำนวณจากรายการบันทึกจริง ไม่รวมยอดต่างสกุลเงินเข้าด้วยกัน</div>
+        <div style="margin-top:18px" id="monthSummary"></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="record">
+    <div class="card">
+      <div class="section-title"><h2>บันทึกการเก็บเงิน</h2><span class="small">เพิ่มเงิน หรือถอน/ใช้เงิน</span></div>
+      <form id="entryForm">
+        <div class="form-grid">
+          <div class="field"><label>วันที่</label><input id="date" type="date" required></div>
+          <div class="field"><label>ประเภทเงิน</label>
+            <select id="bucket"><option value="emergency">🛟 เงินสำรองฉุกเฉิน — EUR</option><option value="investment">📈 เงินลงทุน ETF — USD</option><option value="happiness">☀️ เงินความสุข — THB</option></select>
+          </div>
+          <div class="field"><label>จำนวนเงิน</label><input id="amount" type="number" step="0.01" min="0" placeholder="เช่น 100" required></div>
+          <div class="field"><label>การเคลื่อนไหว</label><select id="type"><option value="add">เพิ่มเงิน / เก็บเงิน</option><option value="subtract">ถอน / ใช้เงิน</option></select></div>
+          <div class="field full"><label>รายละเอียด (ไม่บังคับ)</label><input id="note" maxlength="100" placeholder="เช่น เงินเดือน / ซื้อ VOO / ทริป / ค่าใช้จ่าย"></div>
+        </div>
+        <div class="actions"><button class="secondary" type="reset">ล้าง</button><button class="primary">บันทึกข้อมูล</button></div>
+      </form>
+    </div>
+    <div class="section-title"><h2>ยอดปัจจุบัน</h2></div>
+    <div class="grid three" id="recordCards"></div>
+  </section>
+
+  <section class="section" id="history">
+    <div class="card">
+      <div class="section-title"><h2>ประวัติการบันทึก</h2><button class="secondary" id="clearAll">ล้างข้อมูลทั้งหมด</button></div>
+      <div class="history" id="historyList"></div>
+    </div>
+  </section>
+
+  <section class="section" id="settings">
+    <div class="grid two">
+      <div class="card">
+        <div class="section-title"><h2>อัตราแลกเปลี่ยนสำหรับดูมูลค่า THB</h2></div>
+        <div class="notice">ใช้เพื่อ “ประมาณมูลค่ารวม” เท่านั้น ยอดจริงของแต่ละก้อนยังคงแยกสกุลเงินไว้เสมอ</div>
+        <div class="form-grid" style="margin-top:15px">
+          <div class="field"><label>1 EUR = THB</label><input id="eurRate" type="number" step="0.01"></div>
+          <div class="field"><label>1 USD = THB</label><input id="usdRate" type="number" step="0.01"></div>
+        </div>
+        <div class="actions"><button class="primary" id="saveRates">บันทึกอัตราแลกเปลี่ยน</button></div>
+      </div>
+      <div class="card">
+        <div class="section-title"><h2>ข้อมูลของคุณ</h2></div>
+        <p class="muted" style="line-height:1.7">ข้อมูลทั้งหมดเก็บในอุปกรณ์ของคุณด้วย LocalStorage และใช้งานออฟไลน์ได้หลังจากเปิดแอปครั้งแรก</p>
+        <div class="actions"><button class="secondary" id="exportBtn">Export JSON</button><button class="secondary" id="importBtn">Import JSON</button><input id="importFile" type="file" accept=".json" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">My Savings · Personal Money Journal · Data stays on your device</div>
+</main>
+
+<script>
+const KEY="mySavings_v1";
+const defaultState={entries:[],rates:{EUR:37.2,USD:32.8}};
+let state=JSON.parse(localStorage.getItem(KEY)||"null")||defaultState;
+const meta={
+ emergency:{name:"เงินสำรองฉุกเฉิน",currency:"EUR",icon:"🛟",color:"#76bde8"},
+ investment:{name:"เงินลงทุน ETF",currency:"USD",icon:"📈",color:"#6fbd9a"},
+ happiness:{name:"เงินความสุข",currency:"THB",icon:"☀️",color:"#e6bf73"}
+};
+const $=id=>document.getElementById(id);
+const money=(n,d=2)=>Number(n||0).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d});
+const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
+function totals(){
+ const t={emergency:0,investment:0,happiness:0};
+ state.entries.forEach(e=>t[e.bucket]+=e.type==="add"?Number(e.amount):-Number(e.amount));
+ return t;
+}
+function render(){
+ const t=totals();
+ $("eurTotal").innerHTML=money(t.emergency)+' <span class="currency">EUR</span>';
+ $("usdTotal").innerHTML=money(t.investment)+' <span class="currency">USD</span>';
+ $("thbTotal").innerHTML=money(t.happiness)+' <span class="currency">THB</span>';
+ ["emergency","investment","happiness"].forEach(b=>{
+   const arr=state.entries.filter(e=>e.bucket===b).sort((a,c)=>a.date.localeCompare(c.date)||a.id-c.id);
+   const delta=arr.length?arr[arr.length-1].type==="add"?Number(arr[arr.length-1].amount):Number(arr[arr.length-1].amount)*-1:0;
+   $(b==="emergency"?"eurChange":b==="investment"?"usdChange":"thbChange").innerHTML=arr.length?`ล่าสุด ${delta>=0?"+":""}${money(delta)} ${meta[b].currency}`:"ยังไม่มีข้อมูล";
+ });
+ $("recordCards").innerHTML=Object.entries(meta).map(([b,m])=>`<div class="card"><div class="label">${m.icon} ${m.name}</div><div class="amount">${money(t[b])}</div><div class="small">${m.currency}</div></div>`).join("");
+ renderHistory(); renderMonth(); drawChart();
+}
+function renderHistory(){
+ const list=$("historyList");
+ const arr=[...state.entries].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+ if(!arr.length){list.innerHTML='<div class="empty">ยังไม่มีรายการ ลองบันทึกเงินก้อนแรกของคุณ ✨</div>';return}
+ list.innerHTML=arr.map(e=>{const m=meta[e.bucket], sign=e.type==="add"?"+":"-";return `<div class="row"><div class="small">${e.date}</div><div><span class="dot" style="background:${m.color}"></span><span class="entry-value">${m.name}</span><div class="small">${e.note||"ไม่มีรายละเอียด"}</div></div><div class="${e.type==="add"?"up":"down"}">${sign}${money(e.amount)} ${m.currency}<br><button class="secondary" style="padding:4px 8px;font-size:11px;margin-top:5px" onclick="removeEntry(${e.id})">ลบ</button></div></div>`}).join("");
+}
+function renderMonth(){
+ const now=new Date(), ym=now.toISOString().slice(0,7);
+ const current=state.entries.filter(e=>e.date.startsWith(ym));
+ const sums={emergency:0,investment:0,happiness:0};
+ current.forEach(e=>sums[e.bucket]+=(e.type==="add"?1:-1)*Number(e.amount));
+ $("monthSummary").innerHTML=Object.entries(meta).map(([b,m])=>`<div style="display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line)"><span>${m.icon} ${m.currency}</span><b class="${sums[b]>=0?"up":"down"}">${sums[b]>=0?"+":""}${money(sums[b])}</b></div>`).join("");
+}
+function drawChart(){
+ const c=$("chart"),ctx=c.getContext("2d"),dpr=devicePixelRatio||1,w=c.clientWidth,h=c.clientHeight;c.width=w*dpr;c.height=h*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);
+ const types=["emergency","investment","happiness"], series=types.map(b=>{let v=0;return state.entries.filter(e=>e.bucket===b).sort((a,c)=>a.date.localeCompare(c.date)||a.id-c.id).map(e=>v+=(e.type==="add"?1:-1)*Number(e.amount))});
+ const max=Math.max(1,...series.flatMap(a=>a.map(Math.abs))); const pad={l:36,r:12,t:22,b:28};
+ ctx.font="12px ui-sans-serif";ctx.fillStyle="#8797a3";[0,.5,1].forEach(p=>{let y=pad.t+(h-pad.t-pad.b)*(1-p);ctx.fillText((max*p).toFixed(0),4,y+4);ctx.strokeStyle="rgba(100,130,150,.10)";ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke()});
+ types.forEach((b,i)=>{const a=series[i];if(!a.length)return;ctx.strokeStyle=meta[b].color;ctx.lineWidth=3;ctx.beginPath();a.forEach((v,j)=>{const x=pad.l+(j/Math.max(1,a.length-1))*(w-pad.l-pad.r),y=pad.t+(h-pad.t-pad.b)*(1-Math.max(0,v)/max);j?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke()});
+ ctx.fillStyle="#718593";types.forEach((b,i)=>{ctx.fillStyle=meta[b].color;ctx.fillRect(pad.l+i*105,h-16,9,9);ctx.fillStyle="#718593";ctx.fillText(meta[b].currency,pad.l+14+i*105,h-7)});
+}
+function removeEntry(id){state.entries=state.entries.filter(e=>e.id!==id);save();render()}
+$("entryForm").addEventListener("submit",e=>{e.preventDefault();state.entries.push({id:Date.now(),date:$("date").value,bucket:$("bucket").value,amount:Number($("amount").value),type:$("type").value,note:$("note").value.trim()});save();e.target.reset();$("date").value=new Date().toISOString().slice(0,10);render();document.querySelector('[data-tab="dashboard"]').click()});
+$("date").value=new Date().toISOString().slice(0,10);
+document.querySelectorAll(".tab").forEach(btn=>btn.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".section").forEach(x=>x.classList.remove("active"));btn.classList.add("active");$(btn.dataset.tab).classList.add("active");if(btn.dataset.tab==="dashboard")setTimeout(drawChart,30)});
+$("clearAll").onclick=()=>{if(confirm("ลบข้อมูลการบันทึกทั้งหมดหรือไม่?")){state.entries=[];save();render()}};
+function exportData(){const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="my-savings-backup.json";a.click();URL.revokeObjectURL(a.href)}
+$("exportBtn").onclick=exportData;$("exportTop").onclick=exportData;
+$("importBtn").onclick=()=>$("importFile").click();
+$("importFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x.entries||!x.rates)throw Error();state=x;save();render();alert("นำเข้าข้อมูลสำเร็จ")}catch{alert("ไฟล์ไม่ถูกต้อง")}};r.readAsText(f)};
+$("eurRate").value=state.rates.EUR;$("usdRate").value=state.rates.USD;
+$("saveRates").onclick=()=>{state.rates.EUR=Number($("eurRate").value)||0;state.rates.USD=Number($("usdRate").value)||0;save();alert("บันทึกอัตราแลกเปลี่ยนแล้ว")};
+window.addEventListener("resize",drawChart);
+let deferredPrompt;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("installBtn").hidden=false});
+$("installBtn").onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$("installBtn").hidden=true};
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js"));
+render();
+</script>
+</body>
+</html>
